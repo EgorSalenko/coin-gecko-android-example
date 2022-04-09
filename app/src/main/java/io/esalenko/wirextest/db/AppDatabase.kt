@@ -7,10 +7,12 @@ import androidx.room.RoomDatabase
 import io.esalenko.wirextest.main.data.db.MarketDao
 import io.esalenko.wirextest.main.data.model.MarketEntity
 
-@Database(entities = [MarketEntity::class], version = 1)
+@Database(entities = [MarketEntity::class, RemoteKeysEntity::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun marketDao(): MarketDao
+
+    abstract fun remoteKeysDao(): RemoteKeysDao
 
     companion object {
         @Volatile

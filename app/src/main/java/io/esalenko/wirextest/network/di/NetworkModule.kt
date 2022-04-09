@@ -6,7 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.esalenko.wirextest.BuildConfig
-import io.esalenko.wirextest.network.CoinGeckoApi
+import io.esalenko.wirextest.network.CoinApi
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -36,7 +36,7 @@ object NetworkModule {
     @Provides
     fun provideOkHttpClient(): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BASIC)
         return OkHttpClient()
             .newBuilder()
             .addInterceptor(loggingInterceptor)
@@ -44,6 +44,6 @@ object NetworkModule {
     }
 
     @Provides
-    fun provideCoinGeckoApi(retrofit: Retrofit): CoinGeckoApi =
-        retrofit.create(CoinGeckoApi::class.java)
+    fun provideCoinGeckoApi(retrofit: Retrofit): CoinApi =
+        retrofit.create(CoinApi::class.java)
 }

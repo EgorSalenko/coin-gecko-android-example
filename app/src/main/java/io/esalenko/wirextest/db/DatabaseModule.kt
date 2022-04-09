@@ -18,4 +18,6 @@ object DatabaseModule {
     @Provides
     fun provideMarketDao(database: AppDatabase) = database.marketDao()
 
+    @Provides
+    fun provideRemoteKeysDao(database: AppDatabase) = database.remoteKeysDao()
 }

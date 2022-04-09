@@ -5,10 +5,11 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import io.esalenko.wirextest.db.AppDatabase
+import io.esalenko.wirextest.db.RemoteKeysEntity
 import io.esalenko.wirextest.main.data.model.MarketEntity
 import io.esalenko.wirextest.main.data.model.MarketResponse
 import io.esalenko.wirextest.main.data.model.toEntity
-import io.esalenko.wirextest.network.CoinGeckoApi
+import io.esalenko.wirextest.network.CoinApi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @ExperimentalPagingApi
 internal class MarketDataSource @Inject constructor(
-    private val api: CoinGeckoApi,
+    private val api: CoinApi,
     private val db: AppDatabase,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : RemoteMediator<Int, MarketEntity>() {
@@ -33,18 +34,24 @@ internal class MarketDataSource @Inject constructor(
             try {
                 val nextPage = when (loadType) {
                     LoadType.REFRESH -> FIRST_PAGE
-                    LoadType.APPEND -> state.anchorPosition?.plus(1) ?: FIRST_PAGE
+                    LoadType.APPEND -> db.remoteKeysDao().getRemoteKeys(1).nextKey
                     else -> return@withContext MediatorResult.Success(endOfPaginationReached = true)
                 }
 
                 val marketResponses = api.getMarkets(page = nextPage)
 
                 db.runInTransaction {
-                    if (loadType == LoadType.REFRESH) db.marketDao().clearDb()
+                    if (loadType == LoadType.REFRESH) {
+                        db.remoteKeysDao().clear()
+                        db.marketDao().clear()
+                    }
 
                     marketResponses
                         .map(MarketResponse::toEntity)
                         .let(db.marketDao()::insertMarkets)
+
+                    db.remoteKeysDao()
+                        .insertRemoteKey(RemoteKeysEntity(1, nextPage.plus(1)))
                 }
 
                 return@withContext MediatorResult.Success(endOfPaginationReached = marketResponses.isEmpty())

@@ -9,7 +9,7 @@ import io.esalenko.wirextest.db.AppDatabase
 import io.esalenko.wirextest.main.data.repository.MarketRepository
 import io.esalenko.wirextest.main.data.repository.MarketRepositoryImpl
 import io.esalenko.wirextest.main.data.source.MarketDataSource
-import io.esalenko.wirextest.network.CoinGeckoApi
+import io.esalenko.wirextest.network.CoinApi
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -17,7 +17,7 @@ object MainModule {
 
     @OptIn(ExperimentalPagingApi::class)
     @Provides
-    internal fun provideMarketDataSource(api: CoinGeckoApi, db: AppDatabase): MarketDataSource =
+    internal fun provideMarketDataSource(api: CoinApi, db: AppDatabase): MarketDataSource =
         MarketDataSource(api, db)
 
     @OptIn(ExperimentalPagingApi::class)

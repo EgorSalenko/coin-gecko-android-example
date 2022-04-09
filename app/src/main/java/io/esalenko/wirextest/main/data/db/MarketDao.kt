@@ -17,6 +17,6 @@ interface MarketDao {
     fun insertMarkets(markets: List<MarketEntity>)
 
     @Query("DELETE FROM market")
-    fun clearDb()
+    fun clear()
 
 }
