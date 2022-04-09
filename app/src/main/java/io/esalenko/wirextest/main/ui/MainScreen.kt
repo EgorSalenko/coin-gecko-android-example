@@ -1,5 +1,6 @@
 package io.esalenko.wirextest.main.ui
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,10 +41,10 @@ fun MainScreen(
 
     val listMarkets = viewModel.marketsFlow.collectAsLazyPagingItems()
 
-    LazyColumn(Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(listMarkets) { item ->
             item?.let {
-                MarketItem(item) {
+                MarketItem(item = item) {
                     navigator.navigate(DetailsScreenDestination(id = item.id))
                 }
             }
@@ -53,9 +54,13 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MarketItem(item: MarketEntity, onClick: () -> Unit = {}) {
+fun MarketItem(
+    modifier: Modifier = Modifier,
+    item: MarketEntity,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(horizontal = 8.dp, vertical = 4.dp),
@@ -63,53 +68,67 @@ fun MarketItem(item: MarketEntity, onClick: () -> Unit = {}) {
         onClick = onClick
     ) {
         Row(
-            Modifier
+            modifier = Modifier
                 .padding(all = 8.dp)
                 .fillMaxHeight()
         ) {
-            CurrencyImage(item)
-            CurrencyShortDescription(item)
+            CurrencyImage(item = item)
+            CurrencyShortDescription(item = item)
         }
     }
 }
 
 @Composable
-private fun CurrencyShortDescription(item: MarketEntity) {
+private fun CurrencyShortDescription(
+    modifier: Modifier = Modifier,
+    item: MarketEntity
+) {
     Column(
-        Modifier
+        modifier = modifier
             .padding(start = 16.dp)
             .fillMaxSize(),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = item.name, style = MaterialTheme.typography.subtitle1)
-        Text(text = item.currentPrice.toString(), style = MaterialTheme.typography.caption)
+        Text(
+            text = item.name,
+            style = MaterialTheme.typography.subtitle1
+        )
+        Text(
+            text = item.currentPrice.toString(),
+            style = MaterialTheme.typography.caption
+        )
+
     }
 }
 
 @Composable
-private fun CurrencyImage(item: MarketEntity) {
+private fun CurrencyImage(
+    modifier: Modifier = Modifier,
+    item: MarketEntity
+) {
 
     val context = LocalContext.current
-
-    val imageLoader = ImageLoader.Builder(context)
-        .memoryCache {
-            MemoryCache.Builder(context)
-                .maxSizePercent(0.25)
-                .build()
-        }
-        .diskCache {
-            DiskCache.Builder()
-                .directory(context.cacheDir.resolve("image_cache"))
-                .maxSizePercent(0.02)
-                .build()
-        }
-        .build()
+    val imageLoader = cachableImageLoader(context)
 
     SubcomposeAsyncImage(
-        modifier = Modifier.size(50.dp),
+        modifier = modifier.size(50.dp),
         imageLoader = imageLoader,
         model = item.image,
         loading = { CircularProgressIndicator() },
         contentDescription = null
     )
 }
+
+private fun cachableImageLoader(context: Context) = ImageLoader.Builder(context)
+    .memoryCache {
+        MemoryCache.Builder(context)
+            .maxSizePercent(0.25)
+            .build()
+    }
+    .diskCache {
+        DiskCache.Builder()
+            .directory(context.cacheDir.resolve("image_cache"))
+            .maxSizePercent(0.02)
+            .build()
+    }
+    .build()
