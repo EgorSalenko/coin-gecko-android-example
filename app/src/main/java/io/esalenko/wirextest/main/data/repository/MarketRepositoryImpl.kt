@@ -16,11 +16,17 @@ internal class MarketRepositoryImpl @Inject constructor(
     private val dao: MarketDao
 ) : MarketRepository {
 
-    private val config = PagingConfig(pageSize = 5, prefetchDistance = 5, enablePlaceholders = true)
+    private val config = PagingConfig(
+        pageSize = PAGE_SIZE,
+        enablePlaceholders = true
+    )
 
     override val markets: Flow<PagingData<MarketEntity>> = Pager(
         config = config,
         remoteMediator = mediator
     ) { dao.pagingSource() }.flow
 
+    companion object {
+        private const val PAGE_SIZE = 10
+    }
 }
