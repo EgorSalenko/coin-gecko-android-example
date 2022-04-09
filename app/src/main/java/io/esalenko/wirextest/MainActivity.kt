@@ -1,4 +1,4 @@
-package io.esalenko.wirextest.common
+package io.esalenko.wirextest
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,7 +7,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import dagger.hilt.android.AndroidEntryPoint
-import io.esalenko.wirextest.NavGraphs
 import io.esalenko.wirextest.ui.theme.WirexTestTheme
 
 @AndroidEntryPoint

@@ -51,15 +51,15 @@ fun MainScreen(
 
     val listMarkets = viewModel.marketsFlow.collectAsLazyPagingItems()
 
-    LaunchedEffect(key1 = listMarkets.loadState, block = {
+    val isError = listMarkets.loadState.refresh is LoadState.Error
+
+    LaunchedEffect(listMarkets.loadState) {
         launch {
             viewModel.autoRefreshTick.collect {
                 listMarkets.refresh()
             }
         }
-    })
-
-    val isError = listMarkets.loadState.refresh is LoadState.Error
+    }
 
     Column(
         verticalArrangement = Arrangement.Center,

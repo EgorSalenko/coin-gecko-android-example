@@ -14,4 +14,5 @@ object DetailModule {
 
     @Provides
     fun providesDetailsRepository(api: CoinGeckoApi): DetailsRepository = DetailsRepositoryImpl(api)
+
 }
