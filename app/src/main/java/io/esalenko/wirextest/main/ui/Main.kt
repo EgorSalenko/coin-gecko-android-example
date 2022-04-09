@@ -33,7 +33,7 @@ import io.esalenko.wirextest.main.data.model.MarketEntity
 
 @Destination(start = true)
 @Composable
-fun Currencies(
+fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
     navigator: DestinationsNavigator
 ) {
@@ -88,7 +88,9 @@ private fun CurrencyShortDescription(item: MarketEntity) {
 
 @Composable
 private fun CurrencyImage(item: MarketEntity) {
+
     val context = LocalContext.current
+
     val imageLoader = ImageLoader.Builder(context)
         .memoryCache {
             MemoryCache.Builder(context)
@@ -102,13 +104,12 @@ private fun CurrencyImage(item: MarketEntity) {
                 .build()
         }
         .build()
+
     SubcomposeAsyncImage(
         modifier = Modifier.size(50.dp),
         imageLoader = imageLoader,
         model = item.image,
-        loading = {
-            CircularProgressIndicator()
-        },
+        loading = { CircularProgressIndicator() },
         contentDescription = null
     )
 }

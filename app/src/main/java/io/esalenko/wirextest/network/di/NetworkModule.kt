@@ -21,11 +21,17 @@ object NetworkModule {
 
     @OptIn(ExperimentalSerializationApi::class)
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
-        Retrofit.Builder().baseUrl(BuildConfig.API_URL).client(okHttpClient)
-            .addConverterFactory(Json {
-                ignoreUnknownKeys = true
-            }.asConverterFactory("application/json".toMediaType())).build()
+    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
+
+        val kotlinxSerializationFactory = Json { ignoreUnknownKeys = true }
+            .asConverterFactory("application/json".toMediaType())
+
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.API_URL)
+            .client(okHttpClient)
+            .addConverterFactory(kotlinxSerializationFactory)
+            .build()
+    }
 
     @Provides
     fun provideOkHttpClient(): OkHttpClient {

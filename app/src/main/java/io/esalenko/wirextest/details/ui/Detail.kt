@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 
 @Destination
 @Composable
-fun CurrencyDetails(
+fun DetailsScreen(
     viewModel: DetailsViewModel = hiltViewModel(),
     id: String
 ) {
