@@ -31,8 +31,12 @@ class DetailsViewModel @Inject constructor(
     fun refresh() {
         viewModelScope.launch {
             _detailFlow.value = ViewState.Loading
-            val details = repository.getDetailedMarket(detailsScreenNavArgs.id)
-            _detailFlow.value = ViewState.Success(details)
+            kotlin.runCatching {
+                val details = repository.getDetailedMarket(detailsScreenNavArgs.id)
+                _detailFlow.value = ViewState.Success(details)
+            }.onFailure {
+                _detailFlow.value = ViewState.Error
+            }
         }
     }
 
