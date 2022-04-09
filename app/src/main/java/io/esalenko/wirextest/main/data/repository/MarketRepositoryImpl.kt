@@ -18,7 +18,7 @@ internal class MarketRepositoryImpl @Inject constructor(
 
     private val config = PagingConfig(
         pageSize = PAGE_SIZE,
-        enablePlaceholders = true
+        enablePlaceholders = false
     )
 
     override val markets: Flow<PagingData<MarketEntity>> = Pager(

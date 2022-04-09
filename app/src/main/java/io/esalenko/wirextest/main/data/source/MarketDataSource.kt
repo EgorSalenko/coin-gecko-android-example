@@ -32,26 +32,30 @@ internal class MarketDataSource @Inject constructor(
     ): MediatorResult =
         withContext(ioDispatcher) {
             try {
-                val nextPage = when (loadType) {
+                val nextPage: Int = when (loadType) {
                     LoadType.REFRESH -> FIRST_PAGE
-                    LoadType.APPEND -> db.remoteKeysDao().getRemoteKeys(1).nextKey
-                    else -> return@withContext MediatorResult.Success(endOfPaginationReached = true)
-                }
+                    LoadType.APPEND -> {
+                        db.remoteKeysDao().getRemoteKeys(1).nextKey
+                    }
+                    else -> {
+                        null
+                    }
+                } ?: return@withContext MediatorResult.Success(endOfPaginationReached = true)
 
                 val marketResponses = api.getMarkets(page = nextPage)
 
                 db.runInTransaction {
                     if (loadType == LoadType.REFRESH) {
-                        db.remoteKeysDao().clear()
                         db.marketDao().clear()
+                        db.remoteKeysDao().clear()
                     }
-
-                    marketResponses
-                        .map(MarketResponse::toEntity)
-                        .let(db.marketDao()::insertMarkets)
 
                     db.remoteKeysDao()
                         .insertRemoteKey(RemoteKeysEntity(1, nextPage.plus(1)))
+
+                    marketResponses
+                        .map(MarketResponse::toEntity)
+                        .let(db.marketDao()::insertAll)
                 }
 
                 return@withContext MediatorResult.Success(endOfPaginationReached = marketResponses.isEmpty())

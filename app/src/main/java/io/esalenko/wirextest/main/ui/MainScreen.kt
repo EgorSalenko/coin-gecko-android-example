@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -31,7 +31,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import coil.ImageLoader
-import coil.compose.SubcomposeAsyncImage
+import coil.compose.AsyncImage
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.ramcosta.composedestinations.annotation.Destination
@@ -42,6 +42,8 @@ import io.esalenko.wirextest.main.data.model.MarketEntity
 import io.esalenko.wirextest.ui.SnackbarScreen
 import kotlinx.coroutines.launch
 
+const val FIRST_ITEM_INDEX = 0
+
 @Destination(start = true)
 @Composable
 fun MainScreen(
@@ -49,14 +51,17 @@ fun MainScreen(
     navigator: DestinationsNavigator
 ) {
 
-    val listMarkets = viewModel.marketsFlow.collectAsLazyPagingItems()
+    val pagingSource = viewModel.marketsFlow.collectAsLazyPagingItems()
+    val lazyState = rememberLazyListState()
 
-    val isError = listMarkets.loadState.refresh is LoadState.Error
+    val isError = pagingSource.loadState.refresh is LoadState.Error
 
-    LaunchedEffect(listMarkets.loadState) {
+    LaunchedEffect(pagingSource.loadState) {
         launch {
             viewModel.autoRefreshTick.collect {
-                listMarkets.refresh()
+                if (lazyState.firstVisibleItemIndex == FIRST_ITEM_INDEX) {
+                    pagingSource.refresh()
+                }
             }
         }
     }
@@ -78,8 +83,8 @@ fun MainScreen(
             snackbarMessage = stringResource(id = R.string.common_error),
             showSnackbar = isError
         ) {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(listMarkets) { item ->
+            LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyState) {
+                items(pagingSource) { item ->
                     item?.let {
                         MarketItem(item = item) {
                             navigator.navigate(DetailsScreenDestination(id = item.id))
@@ -160,11 +165,10 @@ private fun CurrencyImage(
     val context = LocalContext.current
     val imageLoader = cachableImageLoader(context)
 
-    SubcomposeAsyncImage(
-        modifier = modifier.size(50.dp),
+    AsyncImage(
+        modifier = modifier.size(90.dp),
         imageLoader = imageLoader,
         model = image,
-        loading = { CircularProgressIndicator(modifier = Modifier.size(10.dp)) },
         contentDescription = null
     )
 }

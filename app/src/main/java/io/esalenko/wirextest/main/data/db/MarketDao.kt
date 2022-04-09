@@ -14,7 +14,7 @@ interface MarketDao {
     fun pagingSource(): PagingSource<Int, MarketEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMarkets(markets: List<MarketEntity>)
+    fun insertAll(markets: List<MarketEntity>)
 
     @Query("DELETE FROM market")
     fun clear()
