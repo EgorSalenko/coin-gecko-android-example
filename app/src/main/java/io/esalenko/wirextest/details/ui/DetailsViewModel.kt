@@ -2,7 +2,43 @@ package io.esalenko.wirextest.details.ui
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.esalenko.wirextest.destinations.CurrencyDetailsDestination
+import io.esalenko.wirextest.details.data.model.DetailMarketResponse
+import io.esalenko.wirextest.details.data.repository.DetailsRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DetailsViewModel(app: Application) : AndroidViewModel(app) {
+@HiltViewModel
+class DetailsViewModel @Inject constructor(
+    saveState: SavedStateHandle,
+    app: Application,
+    private val repository: DetailsRepository
+) : AndroidViewModel(app) {
 
+    private val detailsScreenNavArgs = CurrencyDetailsDestination.argsFrom(saveState)
+
+    private val _detailFlow = MutableStateFlow<ViewState>(ViewState.Loading)
+    val detailFlow = _detailFlow
+
+    init {
+        refresh()
+    }
+
+    fun refresh() {
+        viewModelScope.launch {
+            _detailFlow.value = ViewState.Loading
+            val details = repository.getDetailedMarket(detailsScreenNavArgs.id)
+            _detailFlow.value = ViewState.Success(details)
+        }
+    }
+
+    sealed class ViewState {
+        data class Success(val item: DetailMarketResponse) : ViewState()
+        object Loading : ViewState()
+        object Error : ViewState()
+    }
 }

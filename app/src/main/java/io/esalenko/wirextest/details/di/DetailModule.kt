@@ -1,12 +1,17 @@
 package io.esalenko.wirextest.details.di
 
-import io.esalenko.wirextest.details.ui.DetailsViewModel
-import org.koin.android.ext.koin.androidApplication
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.dsl.module
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import io.esalenko.wirextest.details.data.repository.DetailsRepository
+import io.esalenko.wirextest.details.data.repository.DetailsRepositoryImpl
+import io.esalenko.wirextest.network.CoinGeckoApi
 
-val detailsModule = module {
-    viewModel {
-        DetailsViewModel(androidApplication())
-    }
+@Module
+@InstallIn(SingletonComponent::class)
+object DetailModule {
+
+    @Provides
+    fun providesDetailsRepository(api: CoinGeckoApi): DetailsRepository = DetailsRepositoryImpl(api)
 }
