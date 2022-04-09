@@ -28,7 +28,7 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import io.esalenko.wirextest.destinations.CurrencyDetailsDestination
+import io.esalenko.wirextest.destinations.DetailsScreenDestination
 import io.esalenko.wirextest.main.data.model.MarketEntity
 
 @Destination(start = true)
@@ -44,7 +44,7 @@ fun MainScreen(
         items(listMarkets) { item ->
             item?.let {
                 MarketItem(item) {
-                    navigator.navigate(CurrencyDetailsDestination(id = item.id))
+                    navigator.navigate(DetailsScreenDestination(id = item.id))
                 }
             }
         }

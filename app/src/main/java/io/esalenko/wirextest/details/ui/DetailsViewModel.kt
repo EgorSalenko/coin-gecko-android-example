@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.esalenko.wirextest.destinations.CurrencyDetailsDestination
+import io.esalenko.wirextest.destinations.DetailsScreenDestination
 import io.esalenko.wirextest.details.data.model.DetailMarketResponse
 import io.esalenko.wirextest.details.data.repository.DetailsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ class DetailsViewModel @Inject constructor(
     private val repository: DetailsRepository
 ) : AndroidViewModel(app) {
 
-    private val detailsScreenNavArgs = CurrencyDetailsDestination.argsFrom(saveState)
+    private val detailsScreenNavArgs = DetailsScreenDestination.argsFrom(saveState)
 
     private val _detailFlow = MutableStateFlow<ViewState>(ViewState.Loading)
     val detailFlow = _detailFlow
