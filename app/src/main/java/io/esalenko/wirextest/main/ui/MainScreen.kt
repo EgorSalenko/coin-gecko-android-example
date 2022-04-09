@@ -18,6 +18,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -38,6 +40,7 @@ import io.esalenko.wirextest.R
 import io.esalenko.wirextest.destinations.DetailsScreenDestination
 import io.esalenko.wirextest.main.data.model.MarketEntity
 import io.esalenko.wirextest.ui.SnackbarScreen
+import kotlinx.coroutines.launch
 
 @Destination(start = true)
 @Composable
@@ -48,9 +51,20 @@ fun MainScreen(
 
     val listMarkets = viewModel.marketsFlow.collectAsLazyPagingItems()
 
+    LaunchedEffect(key1 = listMarkets.loadState, block = {
+        launch {
+            viewModel.autoRefreshTick.collect {
+                listMarkets.refresh()
+            }
+        }
+    })
+
     val isError = listMarkets.loadState.refresh is LoadState.Error
 
-    Column {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         TopAppBar(
             elevation = 8.dp,
             title = {
@@ -129,7 +143,7 @@ private fun CurrencyShortDescription(
             )
             Text(
                 modifier = Modifier.padding(start = 8.dp),
-                text = item.priceChange.toString(),
+                text = String.format("%.2f", item.priceChange),
                 color = if (item.priceChange < 0.0f) Color.Red else Color.Green,
                 style = MaterialTheme.typography.caption
             )
