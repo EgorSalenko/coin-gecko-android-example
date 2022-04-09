@@ -16,11 +16,16 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
 import coil.ImageLoader
@@ -29,8 +34,10 @@ import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import io.esalenko.wirextest.R
 import io.esalenko.wirextest.destinations.DetailsScreenDestination
 import io.esalenko.wirextest.main.data.model.MarketEntity
+import io.esalenko.wirextest.ui.SnackbarScreen
 
 @Destination(start = true)
 @Composable
@@ -41,11 +48,29 @@ fun MainScreen(
 
     val listMarkets = viewModel.marketsFlow.collectAsLazyPagingItems()
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(listMarkets) { item ->
-            item?.let {
-                MarketItem(item = item) {
-                    navigator.navigate(DetailsScreenDestination(id = item.id))
+    val isError = listMarkets.loadState.refresh is LoadState.Error
+
+    Column {
+        TopAppBar(
+            elevation = 8.dp,
+            title = {
+                Text(
+                    style = MaterialTheme.typography.h6,
+                    text = stringResource(id = R.string.app_name)
+                )
+            }
+        )
+        SnackbarScreen(
+            snackbarMessage = stringResource(id = R.string.common_error),
+            showSnackbar = isError
+        ) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(listMarkets) { item ->
+                    item?.let {
+                        MarketItem(item = item) {
+                            navigator.navigate(DetailsScreenDestination(id = item.id))
+                        }
+                    }
                 }
             }
         }
@@ -64,7 +89,6 @@ fun MarketItem(
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(horizontal = 8.dp, vertical = 4.dp),
-
         onClick = onClick
     ) {
         Row(
@@ -72,7 +96,7 @@ fun MarketItem(
                 .padding(all = 8.dp)
                 .fillMaxHeight()
         ) {
-            CurrencyImage(item = item)
+            CurrencyImage(image = item.image)
             CurrencyShortDescription(item = item)
         }
     }
@@ -91,20 +115,32 @@ private fun CurrencyShortDescription(
     ) {
         Text(
             text = item.name,
-            style = MaterialTheme.typography.subtitle1
+            style = MaterialTheme.typography.subtitle1,
+            fontWeight = FontWeight.Black
         )
         Text(
-            text = item.currentPrice.toString(),
+            text = stringResource(id = R.string.currency, item.currentPrice),
             style = MaterialTheme.typography.caption
         )
-
+        Row {
+            Text(
+                text = stringResource(id = R.string.percentage_change),
+                style = MaterialTheme.typography.caption
+            )
+            Text(
+                modifier = Modifier.padding(start = 8.dp),
+                text = item.priceChange.toString(),
+                color = if (item.priceChange < 0.0f) Color.Red else Color.Green,
+                style = MaterialTheme.typography.caption
+            )
+        }
     }
 }
 
 @Composable
 private fun CurrencyImage(
     modifier: Modifier = Modifier,
-    item: MarketEntity
+    image: String
 ) {
 
     val context = LocalContext.current
@@ -113,8 +149,8 @@ private fun CurrencyImage(
     SubcomposeAsyncImage(
         modifier = modifier.size(50.dp),
         imageLoader = imageLoader,
-        model = item.image,
-        loading = { CircularProgressIndicator() },
+        model = image,
+        loading = { CircularProgressIndicator(modifier = Modifier.size(10.dp)) },
         contentDescription = null
     )
 }

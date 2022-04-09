@@ -8,5 +8,6 @@ data class MarketEntity(
     @PrimaryKey(autoGenerate = false) val id: String,
     val name: String,
     val image: String,
-    val currentPrice: Float
+    val currentPrice: Float,
+    val priceChange: Float
 )

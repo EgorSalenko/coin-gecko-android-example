@@ -8,8 +8,13 @@ data class MarketResponse(
     val name: String,
     val image: String,
     @SerialName("current_price") val currentPrice: Float,
+    @SerialName("price_change_24h") val priceChange: Float
 )
 
-fun MarketResponse.toEntity(): MarketEntity {
-    return MarketEntity(id, name, image, currentPrice)
-}
+fun MarketResponse.toEntity(): MarketEntity = MarketEntity(
+    id = id,
+    name = name,
+    image = image,
+    currentPrice = currentPrice,
+    priceChange = priceChange
+)
