@@ -37,10 +37,10 @@ internal class MarketDataSource @Inject constructor(
                     LoadType.APPEND -> {
                         db.remoteKeysDao().getRemoteKeys(1).nextKey
                     }
-                    else -> {
-                        null
+                    LoadType.PREPEND -> {
+                        return@withContext MediatorResult.Success(endOfPaginationReached = true)
                     }
-                } ?: return@withContext MediatorResult.Success(endOfPaginationReached = true)
+                }
 
                 val marketResponses = api.getMarkets(page = nextPage)
 
