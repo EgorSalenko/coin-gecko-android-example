@@ -1,5 +1,8 @@
 package io.esalenko.wirextest.details.data.model
 
+import androidx.annotation.Keep
+
+@Keep
 @kotlinx.serialization.Serializable
 data class DetailMarketResponse(
     val id: String,
@@ -8,6 +11,7 @@ data class DetailMarketResponse(
     val name: String
 )
 
+@Keep
 @kotlinx.serialization.Serializable
 data class ImageResponse(
     val thumb: String,
@@ -15,5 +19,6 @@ data class ImageResponse(
     val large: String
 )
 
+@Keep
 @kotlinx.serialization.Serializable
 data class Description(val en: String)
