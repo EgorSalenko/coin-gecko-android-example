@@ -28,12 +28,14 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             buildConfigField "String", "API_URL", "\"https://api.coingecko.com/api/v3/\""
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
+            minifyEnabled true
             buildConfigField "String", "API_URL", "\"https://api.coingecko.com/api/v3/\""
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
