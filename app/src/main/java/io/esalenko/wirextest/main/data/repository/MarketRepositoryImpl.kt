@@ -18,6 +18,7 @@ internal class MarketRepositoryImpl @Inject constructor(
 
     private val config = PagingConfig(
         pageSize = PAGE_SIZE,
+        prefetchDistance = (PAGE_SIZE + PREFETCH_THRESHOLD),
         enablePlaceholders = false
     )
 
@@ -28,5 +29,6 @@ internal class MarketRepositoryImpl @Inject constructor(
 
     companion object {
         private const val PAGE_SIZE = 10
+        private const val PREFETCH_THRESHOLD = 5
     }
 }

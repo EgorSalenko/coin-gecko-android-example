@@ -9,5 +9,6 @@ data class MarketEntity(
     val name: String,
     val image: String,
     val currentPrice: Float,
-    val priceChange: Float
+    val priceChange: Float,
+    val marketCap: Long
 )

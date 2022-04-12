@@ -19,6 +19,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -54,7 +57,8 @@ fun MainScreen(
     val pagingSource = viewModel.marketsFlow.collectAsLazyPagingItems()
     val lazyState = rememberLazyListState()
 
-    val isError = pagingSource.loadState.refresh is LoadState.Error
+    val isError = remember { mutableStateOf(false) }
+    isError.value = pagingSource.loadState.refresh is LoadState.Error
 
     LaunchedEffect(pagingSource.loadState) {
         launch {
@@ -81,7 +85,7 @@ fun MainScreen(
         )
         SnackbarScreen(
             snackbarMessage = stringResource(id = R.string.common_error),
-            showSnackbar = isError
+            showSnackbar = isError.value
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize(), state = lazyState) {
                 items(pagingSource) { item ->
@@ -126,6 +130,8 @@ private fun CurrencyShortDescription(
     modifier: Modifier = Modifier,
     item: MarketEntity
 ) {
+    val textSizeLarge = 18.sp
+    val textSizeSmall = 16.sp
     Column(
         modifier = modifier
             .padding(start = 16.dp)
@@ -135,22 +141,26 @@ private fun CurrencyShortDescription(
         Text(
             text = item.name,
             style = MaterialTheme.typography.subtitle1,
-            fontWeight = FontWeight.Black
+            fontWeight = FontWeight.Black,
+            fontSize = textSizeLarge
         )
         Text(
             text = stringResource(id = R.string.currency, item.currentPrice),
-            style = MaterialTheme.typography.caption
+            style = MaterialTheme.typography.caption,
+            fontSize = textSizeSmall
         )
         Row {
             Text(
                 text = stringResource(id = R.string.percentage_change),
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.caption,
+                fontSize = textSizeSmall
             )
             Text(
                 modifier = Modifier.padding(start = 8.dp),
                 text = String.format("%.2f", item.priceChange),
                 color = if (item.priceChange < 0.0f) Color.Red else Color.Green,
-                style = MaterialTheme.typography.caption
+                style = MaterialTheme.typography.caption,
+                fontSize = textSizeSmall
             )
         }
     }

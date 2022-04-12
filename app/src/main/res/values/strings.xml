@@ -3,4 +3,5 @@
     <string name="common_error">Oops something went wrong!</string>
     <string name="currency">Currency Price: %.2f</string>
     <string name="percentage_change">Price Change 24h:</string>
+    <string name="empty_description">No description available :(</string>
 </resources>

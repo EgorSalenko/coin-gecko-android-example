@@ -10,7 +10,7 @@ import io.esalenko.wirextest.main.data.model.MarketEntity
 @Dao
 interface MarketDao {
 
-    @Query("SELECT * FROM market")
+    @Query("SELECT * FROM market ORDER BY marketCap DESC")
     fun pagingSource(): PagingSource<Int, MarketEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -32,6 +32,6 @@ class MainViewModel @Inject constructor(
         .cachedIn(viewModelScope)
 
     companion object {
-        private const val AUTOUPDATE_TIMEOUT = 10_000L
+        private const val AUTOUPDATE_TIMEOUT = 30_000L
     }
 }

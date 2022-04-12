@@ -2,7 +2,6 @@ package io.esalenko.wirextest.details.ui
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
@@ -21,7 +20,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
@@ -45,7 +46,11 @@ fun DetailsScreen(
 
     var showSnackBar by remember { mutableStateOf(false) }
 
-    val isRefreshing = detail == DetailsViewModel.ViewState.Loading
+    var isRefreshing by remember {
+        mutableStateOf(false)
+    }
+
+    isRefreshing = detail == DetailsViewModel.ViewState.Loading
 
     Column {
         TopAppBar(
@@ -101,19 +106,22 @@ private fun Details(detail: DetailsViewModel.ViewState.Success) {
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 text = detail.item.name,
-                style = MaterialTheme.typography.h5
+                style = MaterialTheme.typography.h5,
+                fontWeight = FontWeight.Black
             )
         }
         item {
+
+            val description = HtmlCompat.fromHtml(
+                detail.item.description.en,
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            ).toString().ifEmpty { stringResource(id = R.string.empty_description) }
+
             Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp, horizontal = 16.dp),
-                text = HtmlCompat.fromHtml(
-                    detail.item.description.en,
-                    HtmlCompat.FROM_HTML_MODE_LEGACY
-                ).toString(),
-                style = MaterialTheme.typography.body2
+                modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp),
+                text = description,
+                style = MaterialTheme.typography.body2,
+                fontSize = 18.sp
             )
         }
     }
