@@ -24,6 +24,7 @@ internal class MarketDataSource @Inject constructor(
 
     companion object {
         private const val FIRST_PAGE = 1
+        private const val REMOTE_KEY_ID = 1
     }
 
     override suspend fun load(
@@ -35,7 +36,7 @@ internal class MarketDataSource @Inject constructor(
                 val nextPage: Int = when (loadType) {
                     LoadType.REFRESH -> FIRST_PAGE
                     LoadType.APPEND -> {
-                        db.remoteKeysDao().getRemoteKeys(1).nextKey
+                        db.remoteKeysDao().getRemoteKeys(REMOTE_KEY_ID).nextKey
                     }
                     LoadType.PREPEND -> {
                         return@withContext MediatorResult.Success(endOfPaginationReached = true)
@@ -51,7 +52,7 @@ internal class MarketDataSource @Inject constructor(
                     }
 
                     db.remoteKeysDao()
-                        .insertRemoteKey(RemoteKeysEntity(1, nextPage.plus(1)))
+                        .insertRemoteKey(RemoteKeysEntity(REMOTE_KEY_ID, nextPage + 1))
 
                     marketResponses
                         .map(MarketResponse::toEntity)
